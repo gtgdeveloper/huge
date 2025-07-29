@@ -76,6 +76,24 @@ setInterval(() => {
   }
 }, 500);
 
+
+function startScoreReporter() {
+  setInterval(() => {
+    if (window.country && window.scoreSent !== score) {
+      window.scoreSent = score;
+      try {
+        fetch('https://hugesmackdown-api.onrender.com/score', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ country })
+        });
+      } catch (e) {
+        console.error('Score API failed', e);
+      }
+    }
+  }, 500);
+}
+
 </script>
 </head>
 <body>
@@ -116,6 +134,24 @@ setInterval(() => {
   }
 }, 500);
 
+
+function startScoreReporter() {
+  setInterval(() => {
+    if (window.country && window.scoreSent !== score) {
+      window.scoreSent = score;
+      try {
+        fetch('https://hugesmackdown-api.onrender.com/score', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ country })
+        });
+      } catch (e) {
+        console.error('Score API failed', e);
+      }
+    }
+  }, 500);
+}
+
 </script>
   </div>
 
@@ -142,6 +178,7 @@ setInterval(() => {
         country = data.country_name || 'Unknown';
         countryCode = data.country_code ? data.country_code.toLowerCase() : '';
         updateScoreBoard();
+startScoreReporter();
       })
       .catch(() => {
         country = 'Unknown';
@@ -286,6 +323,24 @@ setInterval(() => {
     }
   }
 }, 500);
+
+
+function startScoreReporter() {
+  setInterval(() => {
+    if (window.country && window.scoreSent !== score) {
+      window.scoreSent = score;
+      try {
+        fetch('https://hugesmackdown-api.onrender.com/score', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ country })
+        });
+      } catch (e) {
+        console.error('Score API failed', e);
+      }
+    }
+  }, 500);
+}
 
 </script>
 </body>
