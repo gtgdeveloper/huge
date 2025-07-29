@@ -221,13 +221,14 @@ document.body.addEventListener('click', () => {
     resetInactivityTimer();
   
     
+
+
 function showCountryScores() {
   fetch('https://hugesmackdown-api.onrender.com/scores')
     .then(response => response.json())
     .then(data => {
-      let sorted = Object.entries(data).sort((a,b) => b[1]-a[1]);
-      let text = 'Country Scores:
-' + sorted.map(x => `${x[0]}: ${x[1]}`).join('
+      const sorted = Object.entries(data).sort((a,b) => b[1] - a[1]);
+      const lines = sorted.map(([country, count]) => `${country}: ${count}`).join('
 ');
 
       const modal = document.createElement('div');
@@ -248,20 +249,25 @@ function showCountryScores() {
       title.textContent = 'All Country Scores';
       title.style.marginTop = '0';
 
-      const list = document.createElement('pre');
-      list.textContent = text;
+      const pre = document.createElement('pre');
+      pre.textContent = lines;
 
-      const close = document.createElement('button');
-      close.textContent = 'Close';
-      close.style.marginTop = '10px';
-      close.onclick = () => document.body.removeChild(modal);
+      const closeBtn = document.createElement('button');
+      closeBtn.textContent = 'Close';
+      closeBtn.style.marginTop = '10px';
+      closeBtn.onclick = () => document.body.removeChild(modal);
 
       modal.appendChild(title);
-      modal.appendChild(list);
-      modal.appendChild(close);
+      modal.appendChild(pre);
+      modal.appendChild(closeBtn);
       document.body.appendChild(modal);
-    });
+    })
+    .catch(error => console.error('Error loading scores:', error));
 }
+)
+    .catch(err => console.error('Failed to fetch scores:', err));
+}
+
 
     </script>
 </body>
