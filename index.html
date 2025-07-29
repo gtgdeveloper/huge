@@ -28,13 +28,35 @@
       font-size: 24px;
       width: 100%;
     }
+    .ad-container {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      text-align: center;
+      background: #000;
+      padding: 10px 0;
+    }
   </style>
+  <!-- ✅ AdSense script -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7418183819446491"
+          crossorigin="anonymous"></script>
 </head>
 <body>
   <h1 id="gameTitle" style="position:absolute;top:0;margin:10px;font-size:32px;width:100%;text-align:left; left: 10px;">Huge Smackdown</h1>
   <div id="scoreBoard">Score: 0<br>Location: Loading...</div>
   <video id="trumpVideo" preload="auto" muted autoplay></video>
   <audio id="clickSound" src="click.mp3" preload="auto"></audio>
+
+  <!-- ✅ Google AdSense Ad -->
+  <div class="ad-container">
+    <ins class="adsbygoogle"
+         style="display:inline-block;width:728px;height:90px"
+         data-ad-client="ca-pub-7418183819446491"
+         data-ad-slot="8017832992"></ins>
+    <script>
+         (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
 
   <script>
     const video = document.getElementById('trumpVideo');
@@ -148,10 +170,10 @@ style="width:24px;height:16px;vertical-align:middle;margin-left:5px;">` : '';
           fetch('https://hugesmackdown-api.onrender.com/score', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ country })
+            body: JSON.stringify({ country, score })
           }).catch((e) => console.error("Score submit failed", e));
         }
-      }, 500);
+      }, 1000);
     }
   </script>
 </body>
