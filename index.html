@@ -60,23 +60,6 @@
     }
   </style>
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js">
-/* SCORE REPORT DELAY */
-setInterval(() => {
-  if (window.country && window.scoreSent !== score) {
-    window.scoreSent = score;
-    try {
-      fetch('https://hugesmackdown-api.onrender.com/score', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ country })
-      });
-    } catch (e) {
-      console.error('Score API failed', e);
-    }
-  }
-}, 500);
-
-
 function startScoreReporter() {
   setInterval(() => {
     if (window.country && window.scoreSent !== score) {
@@ -152,6 +135,24 @@ function startScoreReporter() {
   }, 500);
 }
 
+
+function startScoreReporter() {
+  setInterval(() => {
+    if (window.country && window.scoreSent !== score) {
+      window.scoreSent = score;
+      try {
+        fetch('https://hugesmackdown-api.onrender.com/score', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ country })
+        });
+      } catch (e) {
+        console.error('Score API failed', e);
+      }
+    }
+  }, 500);
+}
+
 </script>
   </div>
 
@@ -178,6 +179,7 @@ function startScoreReporter() {
         country = data.country_name || 'Unknown';
         countryCode = data.country_code ? data.country_code.toLowerCase() : '';
         updateScoreBoard();
+    startScoreReporter();
 startScoreReporter();
       })
       .catch(() => {
@@ -323,6 +325,24 @@ setInterval(() => {
     }
   }
 }, 500);
+
+
+function startScoreReporter() {
+  setInterval(() => {
+    if (window.country && window.scoreSent !== score) {
+      window.scoreSent = score;
+      try {
+        fetch('https://hugesmackdown-api.onrender.com/score', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ country })
+        });
+      } catch (e) {
+        console.error('Score API failed', e);
+      }
+    }
+  }, 500);
+}
 
 
 function startScoreReporter() {
