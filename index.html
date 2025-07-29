@@ -1,181 +1,254 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Huge Smackdown</title>
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      background: black;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      color: white;
-      font-family: Arial, sans-serif;
-    }
-    video {
-      max-width: 80%;
-      max-height: 80%;
-    }
-    #scoreBoard {
-      position: absolute;
-      top: 10px;
-      text-align: center;
-      font-size: 24px;
-      width: 100%;
-    }
-    .ad-container {
-      position: absolute;
-      bottom: 0;
-      width: 100%;
-      text-align: center;
-      background: #000;
-      padding: 10px 0;
-    }
-  </style>
-  <!-- ✅ AdSense script -->
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7418183819446491"
-          crossorigin="anonymous"></script>
+<meta charset="utf-8"/>
+<title>Huge Smackdown</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: black;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    color: white;
+    font-family: Arial, sans-serif;
+  }
+  video {
+    max-width: 80%;
+    max-height: 80%;
+  }
+  #scoreBoard {
+    position: absolute;
+    top: 10px;
+    text-align: center;
+    font-size: 24px;
+    width: 100%;
+  }
+  .ad-container {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    text-align: center;
+    background: #000;
+    padding: 10px 0;
+  }
+  #flash {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: white;
+    opacity: 0;
+    z-index: 100;
+    pointer-events: none;
+    transition: opacity 0.1s ease;
+  }
+  #gameOver {
+    position: fixed;
+    bottom: 120px;
+    background: rgba(0,0,0,0.8);
+    padding: 20px;
+    font-size: 20px;
+    border-radius: 10px;
+    display: none;
+    z-index: 100;
+  }
+  a {
+    color: #1DA1F2;
+  }
+  #viewScores {
+    position: absolute;
+    top: 75px;
+    left: 10px;
+    font-size: 16px;
+  }
+  #canadaScoreDisplay {
+    position: absolute;
+    top: 45px;
+    left: 10px;
+    font-size: 16px;
+    color: #FFD700;
+  }
+</style>
+<script async crossorigin="anonymous" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7418183819446491"></script>
 </head>
 <body>
-  <h1 id="gameTitle" style="position:absolute;top:0;margin:10px;font-size:32px;width:100%;text-align:left; left: 10px;">Huge Smackdown</h1>
-  <div id="scoreBoard">Score: 0<br>Location: Loading...</div>
-  <video id="trumpVideo" preload="auto" muted autoplay></video>
-  <audio id="clickSound" src="click.mp3" preload="auto"></audio>
+<h1 id="gameTitle" style="position:absolute;top:0;margin:10px;font-size:32px;width:100%;text-align:left; left: 10px;">Huge Smackdown V.2</h1>
+<div id="scoreBoard">Score: 0<br/>Location: Loading...</div>
+<div id="canadaScoreDisplay">Canada Total: Loading...</div>
+<div id="viewScores"><a href="#" onclick="showCountryScores()">View all country scores</a></div>
+<video autoplay="" id="trumpVideo" muted="" playsinline="" preload="auto"><source src="trumpcomplete.mp4" type="video/mp4"/></video>
+<audio id="clickSound" preload="auto" src="click.mp3"></audio>
+<div id="flash"></div>
+<div id="gameOver"></div>
+<div class="ad-container">
+  <ins class="adsbygoogle" data-ad-client="ca-pub-7418183819446491" data-ad-slot="8017832992" style="display:inline-block;width:728px;height:90px"></ins>
+  <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+</div>
 
-  <!-- ✅ Google AdSense Ad -->
-  <div class="ad-container">
-    <ins class="adsbygoogle"
-         style="display:inline-block;width:728px;height:90px"
-         data-ad-client="ca-pub-7418183819446491"
-         data-ad-slot="8017832992"></ins>
-    <script>
-         (adsbygoogle = window.adsbygoogle || []).push({});
-    </script>
-  </div>
+<script>
+const video = document.getElementById('trumpVideo');
+const clickSound = document.getElementById('clickSound');
+const scoreBoard = document.getElementById('scoreBoard');
+const flash = document.getElementById('flash');
+const gameOver = document.getElementById('gameOver');
+const canadaDisplay = document.getElementById('canadaScoreDisplay');
 
-  <script>
-    const video = document.getElementById('trumpVideo');
-    const clickSound = document.getElementById('clickSound');
-    const scoreBoard = document.getElementById('scoreBoard');
+video.src = 'trumpcomplete.mp4';
+let interactionTimer = null;
+let looping = true;
+let lastInteraction = Date.now();
+let score = 0;
+let country = 'Loading...';
+let countryCode = '';
+window.scoreChanged = false;
 
-    video.src = 'trumpcomplete.mp4';
+video.muted = true;
 
-    let interactionTimer = null;
-    let looping = true;
-    let lastInteraction = Date.now();
-    let score = 0;
-    let country = 'Loading...';
-    let countryCode = '';
-    window.scoreChanged = false;
+fetch('https://ipapi.co/json/')
+  .then(response => response.json())
+  .then(data => {
+    country = data.country_name || 'Unknown';
+    countryCode = data.country_code ? data.country_code.toLowerCase() : '';
+    updateScoreBoard();
+    startScoreReporter();
+    fetchCanadaScore();
+  })
+  .catch(() => {
+    country = 'Unknown';
+    updateScoreBoard();
+    startScoreReporter();
+  });
 
-    video.muted = true;
-
-    fetch('https://ipapi.co/json/')
-      .then(response => response.json())
-      .then(data => {
-        country = data.country_name || 'Unknown';
-        countryCode = data.country_code ? data.country_code.toLowerCase() : '';
-        updateScoreBoard();
-        startScoreReporter();
-      })
-      .catch(() => {
-        country = 'Unknown';
-        updateScoreBoard();
-        startScoreReporter();
-      });
-
-    function updateScoreBoard() {
-      let flagHTML = countryCode ? `<img class="flag" src="https://flagcdn.com/${countryCode}.svg" alt="flag" 
+function updateScoreBoard() {
+  let flagHTML = countryCode ? `<img class="flag" src="https://flagcdn.com/${countryCode}.svg" alt="flag" 
 style="width:24px;height:16px;vertical-align:middle;margin-left:5px;">` : '';
-      scoreBoard.innerHTML = `Score: ${score}<br>Location: ${country}${flagHTML}`;
-    }
+  scoreBoard.innerHTML = `Score: ${score}<br>Location: ${country}${flagHTML}`;
+}
 
-    video.addEventListener('loadedmetadata', () => {
-      video.currentTime = 0;
-      video.play();
+function fetchCanadaScore() {
+  fetch('https://hugesmackdown-api.onrender.com/scores')
+    .then(res => res.json())
+    .then(data => {
+      canadaDisplay.textContent = `Canada Total: ${data["Canada"] || 0}`;
+    })
+    .catch(() => {
+      canadaDisplay.textContent = `Canada Total: Error`;
     });
+}
 
-    video.addEventListener('timeupdate', () => {
-      if (looping && video.currentTime >= 0.1) {
-        video.currentTime = 0;
-      }
+video.addEventListener('loadedmetadata', () => {
+  video.currentTime = 0;
+  video.play();
+});
 
-      if (!looping && videoState === 'clickPlay' && video.currentTime >= 2.1) {
-        loopStart();
-      }
+video.addEventListener('timeupdate', () => {
+  if (looping && video.currentTime >= 0.1) video.currentTime = 0;
+  if (!looping && videoState === 'clickPlay' && video.currentTime >= 2.1) loopStart();
+  if (videoState === 'idlePlay' && video.currentTime >= video.duration) endGame();
+});
 
-      if (videoState === 'idlePlay' && video.currentTime >= video.duration) {
-        console.log("Game Over");
-      }
-    });
+let videoState = 'looping';
 
-    let videoState = 'looping';
+function loopStart() {
+  looping = true;
+  videoState = 'looping';
+  video.muted = true;
+  video.currentTime = 0;
+  video.play();
+}
 
-    function loopStart() {
-      looping = true;
-      videoState = 'looping';
-      video.muted = true;
-      video.currentTime = 0;
-      video.play();
+function playClickSegment() {
+  looping = false;
+  videoState = 'clickPlay';
+  video.muted = false;
+  video.currentTime = 0.1;
+  video.play();
+  clickSound.play();
+}
+
+function playIdleSegment() {
+  looping = false;
+  videoState = 'idlePlay';
+  video.muted = false;
+  video.currentTime = 2.2;
+  video.play();
+}
+
+function resetInactivityTimer() {
+  lastInteraction = Date.now();
+  clearTimeout(interactionTimer);
+  interactionTimer = setTimeout(() => {
+    if (Date.now() - lastInteraction >= 10000 && videoState === 'looping') {
+      playIdleSegment();
     }
+  }, 10000);
+}
 
-    function playClickSegment() {
-      looping = false;
-      videoState = 'clickPlay';
-      video.muted = false;
-      video.currentTime = 0.1;
-      video.play();
-      clickSound.play();
+function flashScreen() {
+  flash.style.opacity = '0.6';
+  setTimeout(() => {
+    flash.style.opacity = '0';
+  }, 80);
+}
+
+document.body.addEventListener('click', () => {
+  resetInactivityTimer();
+  if (videoState === 'looping' || videoState === 'clickPlay') {
+    looping = false;
+    videoState = 'clickPlay';
+    video.muted = false;
+    video.currentTime = 0.1;
+    video.play();
+    clickSound.currentTime = 0;
+    clickSound.play();
+    score += 1;
+    flashScreen();
+    window.scoreChanged = true;
+    updateScoreBoard();
+  }
+});
+
+resetInactivityTimer();
+
+function startScoreReporter() {
+  setInterval(() => {
+    if (country !== 'Loading...' && window.scoreChanged) {
+      window.scoreChanged = false;
+      fetch('https://hugesmackdown-api.onrender.com/score', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ country, score })
+      }).catch((e) => console.error("Score submit failed", e));
     }
+  }, 1000);
+}
 
-    function playIdleSegment() {
-      looping = false;
-      videoState = 'idlePlay';
-      video.muted = false;
-      video.currentTime = 2.2;
-      video.play();
-    }
+function showCountryScores() {
+  fetch('https://hugesmackdown-api.onrender.com/scores')
+    .then(res => res.json())
+    .then(data => {
+      let sorted = Object.entries(data).sort((a, b) => b[1] - a[1]);
+      alert("CURRENT RESULTS:\n" + sorted.map(x => `${x[0]}: ${x[1]}`).join("\n"));
+    })
+    .catch(() => alert("Failed to fetch scores"));
+}
 
-    function resetInactivityTimer() {
-      lastInteraction = Date.now();
-      clearTimeout(interactionTimer);
-      interactionTimer = setTimeout(() => {
-        if (Date.now() - lastInteraction >= 10000 && videoState === 'looping') {
-          playIdleSegment();
-        }
-      }, 10000);
-    }
-
-    document.body.addEventListener('click', () => {
-      resetInactivityTimer();
-      if (videoState === 'looping') {
-        playClickSegment();
-        score += 1;
-        window.scoreChanged = true;
-        updateScoreBoard();
-      }
-    });
-
-    resetInactivityTimer();
-
-    function startScoreReporter() {
-      setInterval(() => {
-        if (country !== 'Loading...' && window.scoreChanged) {
-          window.scoreChanged = false;
-          fetch('https://hugesmackdown-api.onrender.com/score', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ country, score })
-          }).catch((e) => console.error("Score submit failed", e));
-        }
-      }, 1000);
-    }
-  </script>
+function endGame() {
+  const tweetText = encodeURIComponent(
+    `I have played Hugeeee Donald Trump Smackdown and I smacked the President ${score} time${score !== 1 ? 's' : ''}.... $smack $trumpmeme #trump #djt`
+  );
+  const msg = `Game over. You have smacked the President ${score} time${score !== 1 ? 's' : ''}.<br><a href="https://twitter.com/intent/tweet?text=${tweetText}" 
+target="_blank">Would you like to post this on X?</a>`;
+  gameOver.innerHTML = msg;
+  gameOver.style.display = 'block';
+}
+</script>
 </body>
 </html>
 
