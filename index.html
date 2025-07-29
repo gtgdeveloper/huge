@@ -109,26 +109,10 @@
         country = data.country_name || 'Unknown';
         countryCode = data.country_code ? data.country_code.toLowerCase() : '';
         updateScoreBoard();
-
-  // Send score to backend API
-  fetch('https://hugesmackdown-api.onrender.com/score', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ country })
-  }).catch(err => console.error('Score update failed:', err));
-
       })
       .catch(() => {
         country = 'Unknown';
         updateScoreBoard();
-
-  // Send score to backend API
-  fetch('https://hugesmackdown-api.onrender.com/score', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ country })
-  }).catch(err => console.error('Score update failed:', err));
-
       });
 
     function updateScoreBoard() {
@@ -218,14 +202,6 @@ document.body.addEventListener('click', () => {
   globalScores[country] = (globalScores[country] || 0) + 1;
   localStorage.setItem('globalCountryScores', JSON.stringify(globalScores));
   updateScoreBoard();
-
-  // Send score to backend API
-  fetch('https://hugesmackdown-api.onrender.com/score', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ country })
-  }).catch(err => console.error('Score update failed:', err));
-
   clickSound.play();
 
   video.muted = false;
@@ -239,14 +215,6 @@ document.body.addEventListener('click', () => {
         globalScores[country] = (globalScores[country] || 0) + 1;
         localStorage.setItem('globalCountryScores', JSON.stringify(globalScores));
         updateScoreBoard();
-
-  // Send score to backend API
-  fetch('https://hugesmackdown-api.onrender.com/score', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ country })
-  }).catch(err => console.error('Score update failed:', err));
-
       }
     });
 
@@ -293,9 +261,8 @@ function showCountryScores() {
       modal.appendChild(close);
       document.body.appendChild(modal);
     });
+}
 
-    
-    }
     </script>
 </body>
 
