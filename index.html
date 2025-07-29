@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Huge Smackdown V.2</title>
+  <title>Trump Video Game</title>
   <style>
     html, body {
       margin: 0;
@@ -59,12 +59,28 @@
       margin-left: 5px;
     }
   </style>
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js">
+/* SCORE REPORT DELAY */
+setInterval(() => {
+  if (window.country && window.scoreSent !== score) {
+    window.scoreSent = score;
+    try {
+      fetch('https://hugesmackdown-api.onrender.com/score', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ country })
+      });
+    } catch (e) {
+      console.error('Score API failed', e);
+    }
+  }
+}, 500);
+
+</script>
 </head>
 <body>
-  <h1 id="gameTitle" style="position:absolute;top:0;margin:10px;font-size:32px;width:100%;text-align:left; left: 10px;">Huge Smackdown V.2</h1>
+  <h1 id="gameTitle" style="position:absolute;top:0;margin:10px;font-size:32px;width:100%;text-align:left; left: 10px;">Huge Smackdown</h1>
   <div id="scoreBoard">Score: 0<br>Location: Loading...</div>
-  <div id="flash" style="position:absolute;width:100%;height:100%;top:0;left:0;z-index:5;background:rgba(255,255,255,0);pointer-events:none;"></div>
   <video id="trumpVideo" preload="auto" muted autoplay></video>
   <audio id="clickSound" src="click.mp3" preload="auto"></audio>
   <div id="viewScores" style="position:absolute;top:75px;text-align:left;left:10px;font-size:16px;">
@@ -83,7 +99,24 @@
          data-full-width-responsive="true"></ins>
     <script>
          (adsbygoogle = window.adsbygoogle || []).push({});
-    </script>
+    
+/* SCORE REPORT DELAY */
+setInterval(() => {
+  if (window.country && window.scoreSent !== score) {
+    window.scoreSent = score;
+    try {
+      fetch('https://hugesmackdown-api.onrender.com/score', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ country })
+      });
+    } catch (e) {
+      console.error('Score API failed', e);
+    }
+  }
+}, 500);
+
+</script>
   </div>
 
   <script>
@@ -187,27 +220,7 @@
       gameOver.style.display = 'block';
     }
 
-    
-document.body.addEventListener('click', () => {
-  resetInactivityTimer();
-
-  // Flash effect
-  const flash = document.getElementById('flash');
-  flash.style.background = 'rgba(255,255,255,0.3)';
-  setTimeout(() => {
-    flash.style.background = 'rgba(255,255,255,0)';
-  }, 80);
-
-  score += 1;
-  globalScores[country] = (globalScores[country] || 0) + 1;
-  localStorage.setItem('globalCountryScores', JSON.stringify(globalScores));
-  updateScoreBoard();
-  clickSound.play();
-
-  video.muted = false;
-  video.currentTime = 0.1;
-  video.play();
-
+    document.body.addEventListener('click', () => {
       resetInactivityTimer();
       if (videoState === 'looping') {
         playClickSegment();
@@ -220,56 +233,61 @@ document.body.addEventListener('click', () => {
 
     resetInactivityTimer();
   
+    function showCountryScores() {
+      let scores = JSON.parse(localStorage.getItem('globalCountryScores') || '{}');
+      let sorted = Object.entries(scores).sort((a,b) => b[1]-a[1]);
+      let text = 'Country Scores:\n' + sorted.map(x => `${x[0]}: ${x[1]}`).join('\n');
+      
+    const modal = document.createElement('div');
+    modal.style.position = 'fixed';
+    modal.style.top = '50%';
+    modal.style.left = '50%';
+    modal.style.transform = 'translate(-50%, -50%)';
+    modal.style.background = '#111';
+    modal.style.color = 'white';
+    modal.style.padding = '20px';
+    modal.style.borderRadius = '10px';
+    modal.style.maxHeight = '80vh';
+    modal.style.overflowY = 'auto';
+    modal.style.zIndex = 1000;
+    modal.style.boxShadow = '0 0 10px #000';
+
+    const title = document.createElement('h2');
+    title.textContent = 'All Country Scores';
+    title.style.marginTop = '0';
+
+    const list = document.createElement('pre');
+    list.textContent = text;
+
+    const close = document.createElement('button');
+    close.textContent = 'Close';
+    close.style.marginTop = '10px';
+    close.onclick = () => document.body.removeChild(modal);
+
+    modal.appendChild(title);
+    modal.appendChild(list);
+    modal.appendChild(close);
+    document.body.appendChild(modal);
     
+    }
+    
+/* SCORE REPORT DELAY */
+setInterval(() => {
+  if (window.country && window.scoreSent !== score) {
+    window.scoreSent = score;
+    try {
+      fetch('https://hugesmackdown-api.onrender.com/score', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ country })
+      });
+    } catch (e) {
+      console.error('Score API failed', e);
+    }
+  }
+}, 500);
 
-
-function showCountryScores() {
-  fetch('https://hugesmackdown-api.onrender.com/scores')
-    .then(response => response.json())
-    .then(data => {
-      const sorted = Object.entries(data).sort((a,b) => b[1] - a[1]);
-      const lines = sorted.map(([country, count]) => `${country}: ${count}`).join('
-');
-
-      const modal = document.createElement('div');
-      modal.style.position = 'fixed';
-      modal.style.top = '50%';
-      modal.style.left = '50%';
-      modal.style.transform = 'translate(-50%, -50%)';
-      modal.style.background = '#111';
-      modal.style.color = 'white';
-      modal.style.padding = '20px';
-      modal.style.borderRadius = '10px';
-      modal.style.maxHeight = '80vh';
-      modal.style.overflowY = 'auto';
-      modal.style.zIndex = 1000;
-      modal.style.boxShadow = '0 0 10px #000';
-
-      const title = document.createElement('h2');
-      title.textContent = 'All Country Scores';
-      title.style.marginTop = '0';
-
-      const pre = document.createElement('pre');
-      pre.textContent = lines;
-
-      const closeBtn = document.createElement('button');
-      closeBtn.textContent = 'Close';
-      closeBtn.style.marginTop = '10px';
-      closeBtn.onclick = () => document.body.removeChild(modal);
-
-      modal.appendChild(title);
-      modal.appendChild(pre);
-      modal.appendChild(closeBtn);
-      document.body.appendChild(modal);
-    })
-    .catch(error => console.error('Error loading scores:', error));
-}
-)
-    .catch(err => console.error('Failed to fetch scores:', err));
-}
-
-
-    </script>
+</script>
 </body>
 
 </html>
