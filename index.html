@@ -109,10 +109,26 @@
         country = data.country_name || 'Unknown';
         countryCode = data.country_code ? data.country_code.toLowerCase() : '';
         updateScoreBoard();
+
+  // Send score to backend API
+  fetch('https://hugesmackdown-api.onrender.com/score', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ country })
+  }).catch(err => console.error('Score update failed:', err));
+
       })
       .catch(() => {
         country = 'Unknown';
         updateScoreBoard();
+
+  // Send score to backend API
+  fetch('https://hugesmackdown-api.onrender.com/score', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ country })
+  }).catch(err => console.error('Score update failed:', err));
+
       });
 
     function updateScoreBoard() {
@@ -202,6 +218,14 @@ document.body.addEventListener('click', () => {
   globalScores[country] = (globalScores[country] || 0) + 1;
   localStorage.setItem('globalCountryScores', JSON.stringify(globalScores));
   updateScoreBoard();
+
+  // Send score to backend API
+  fetch('https://hugesmackdown-api.onrender.com/score', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ country })
+  }).catch(err => console.error('Score update failed:', err));
+
   clickSound.play();
 
   video.muted = false;
@@ -215,46 +239,61 @@ document.body.addEventListener('click', () => {
         globalScores[country] = (globalScores[country] || 0) + 1;
         localStorage.setItem('globalCountryScores', JSON.stringify(globalScores));
         updateScoreBoard();
+
+  // Send score to backend API
+  fetch('https://hugesmackdown-api.onrender.com/score', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ country })
+  }).catch(err => console.error('Score update failed:', err));
+
       }
     });
 
     resetInactivityTimer();
   
-    function showCountryScores() {
-      let scores = JSON.parse(localStorage.getItem('globalCountryScores') || '{}');
-      let sorted = Object.entries(scores).sort((a,b) => b[1]-a[1]);
-      let text = 'Country Scores:\n' + sorted.map(x => `${x[0]}: ${x[1]}`).join('\n');
-      
-    const modal = document.createElement('div');
-    modal.style.position = 'fixed';
-    modal.style.top = '50%';
-    modal.style.left = '50%';
-    modal.style.transform = 'translate(-50%, -50%)';
-    modal.style.background = '#111';
-    modal.style.color = 'white';
-    modal.style.padding = '20px';
-    modal.style.borderRadius = '10px';
-    modal.style.maxHeight = '80vh';
-    modal.style.overflowY = 'auto';
-    modal.style.zIndex = 1000;
-    modal.style.boxShadow = '0 0 10px #000';
+    
+function showCountryScores() {
+  fetch('https://hugesmackdown-api.onrender.com/scores')
+    .then(response => response.json())
+    .then(data => {
+      let sorted = Object.entries(data).sort((a,b) => b[1]-a[1]);
+      let text = 'Country Scores:
+' + sorted.map(x => `${x[0]}: ${x[1]}`).join('
+');
 
-    const title = document.createElement('h2');
-    title.textContent = 'All Country Scores';
-    title.style.marginTop = '0';
+      const modal = document.createElement('div');
+      modal.style.position = 'fixed';
+      modal.style.top = '50%';
+      modal.style.left = '50%';
+      modal.style.transform = 'translate(-50%, -50%)';
+      modal.style.background = '#111';
+      modal.style.color = 'white';
+      modal.style.padding = '20px';
+      modal.style.borderRadius = '10px';
+      modal.style.maxHeight = '80vh';
+      modal.style.overflowY = 'auto';
+      modal.style.zIndex = 1000;
+      modal.style.boxShadow = '0 0 10px #000';
 
-    const list = document.createElement('pre');
-    list.textContent = text;
+      const title = document.createElement('h2');
+      title.textContent = 'All Country Scores';
+      title.style.marginTop = '0';
 
-    const close = document.createElement('button');
-    close.textContent = 'Close';
-    close.style.marginTop = '10px';
-    close.onclick = () => document.body.removeChild(modal);
+      const list = document.createElement('pre');
+      list.textContent = text;
 
-    modal.appendChild(title);
-    modal.appendChild(list);
-    modal.appendChild(close);
-    document.body.appendChild(modal);
+      const close = document.createElement('button');
+      close.textContent = 'Close';
+      close.style.marginTop = '10px';
+      close.onclick = () => document.body.removeChild(modal);
+
+      modal.appendChild(title);
+      modal.appendChild(list);
+      modal.appendChild(close);
+      document.body.appendChild(modal);
+    });
+
     
     }
     </script>
