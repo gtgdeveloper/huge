@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Trump Video Game</title>
+  <meta charset="UTF-8" />
+  <title>Huge Smackdown</title>
   <style>
     html, body {
       margin: 0;
@@ -28,139 +28,19 @@
       font-size: 24px;
       width: 100%;
     }
-    #gameOver {
-      display: none;
-      z-index: 10;
-      background: rgba(0, 0, 0, 0.8);
-      border-radius: 10px;
-      text-align: center;
-      position: fixed;
-      bottom: 110px; /* moved up to appear above ad */
-      font-size: 20px;
-      padding: 10px;
-    }
-    #shareLink {
-      color: #1DA1F2;
-      text-decoration: underline;
-      cursor: pointer;
-    }
-    .ad-container {
-      position: absolute;
-      bottom: 0;
-      width: 100%;
-      text-align: center;
-      background: #000;
-      padding: 10px 0;
-    }
-    .flag {
-      width: 24px;
-      height: 16px;
-      vertical-align: middle;
-      margin-left: 5px;
-    }
   </style>
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js">
-function startScoreReporter() {
-  setInterval(() => {
-    if (window.country && window.scoreSent !== score) {
-      window.scoreSent = score;
-      try {
-        fetch('https://hugesmackdown-api.onrender.com/score', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ country })
-        });
-      } catch (e) {
-        console.error('Score API failed', e);
-      }
-    }
-  }, 500);
-}
-
-</script>
 </head>
 <body>
   <h1 id="gameTitle" style="position:absolute;top:0;margin:10px;font-size:32px;width:100%;text-align:left; left: 10px;">Huge Smackdown</h1>
   <div id="scoreBoard">Score: 0<br>Location: Loading...</div>
   <video id="trumpVideo" preload="auto" muted autoplay></video>
   <audio id="clickSound" src="click.mp3" preload="auto"></audio>
-  <div id="viewScores" style="position:absolute;top:75px;text-align:left;left:10px;font-size:16px;">
-      <a href="#" onclick="showCountryScores()" style="color:#0af;text-decoration:underline;">View all country scores</a>
-     </div>
-     <div id="gameOver">
-    <br><a href="#" onclick="showCountryScores()" style="color:#0af;text-decoration:underline;">View all country scores</a><br></div>
-
-  <div class="ad-container">
-    <!-- Replace with your AdSense code -->
-    <ins class="adsbygoogle"
-         style="display:block"
-         data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
-         data-ad-slot="XXXXXXXXXX"
-         data-ad-format="auto"
-         data-full-width-responsive="true"></ins>
-    <script>
-         (adsbygoogle = window.adsbygoogle || []).push({});
-    
-/* SCORE REPORT DELAY */
-setInterval(() => {
-  if (window.country && window.scoreSent !== score) {
-    window.scoreSent = score;
-    try {
-      fetch('https://hugesmackdown-api.onrender.com/score', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ country })
-      });
-    } catch (e) {
-      console.error('Score API failed', e);
-    }
-  }
-}, 500);
-
-
-function startScoreReporter() {
-  setInterval(() => {
-    if (window.country && window.scoreSent !== score) {
-      window.scoreSent = score;
-      try {
-        fetch('https://hugesmackdown-api.onrender.com/score', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ country })
-        });
-      } catch (e) {
-        console.error('Score API failed', e);
-      }
-    }
-  }, 500);
-}
-
-
-function startScoreReporter() {
-  setInterval(() => {
-    if (window.country && window.scoreSent !== score) {
-      window.scoreSent = score;
-      try {
-        fetch('https://hugesmackdown-api.onrender.com/score', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ country })
-        });
-      } catch (e) {
-        console.error('Score API failed', e);
-      }
-    }
-  }, 500);
-}
-
-</script>
-  </div>
 
   <script>
     const video = document.getElementById('trumpVideo');
     const clickSound = document.getElementById('clickSound');
     const scoreBoard = document.getElementById('scoreBoard');
-    const gameOver = document.getElementById('gameOver');
+
     video.src = 'trumpcomplete.mp4';
 
     let interactionTimer = null;
@@ -169,7 +49,7 @@ function startScoreReporter() {
     let score = 0;
     let country = 'Loading...';
     let countryCode = '';
-    let globalScores = JSON.parse(localStorage.getItem('globalCountryScores') || '{}');
+    window.scoreChanged = false;
 
     video.muted = true;
 
@@ -179,18 +59,18 @@ function startScoreReporter() {
         country = data.country_name || 'Unknown';
         countryCode = data.country_code ? data.country_code.toLowerCase() : '';
         updateScoreBoard();
-    startScoreReporter();
-startScoreReporter();
+        startScoreReporter();
       })
       .catch(() => {
         country = 'Unknown';
         updateScoreBoard();
+        startScoreReporter();
       });
 
     function updateScoreBoard() {
-      let flagHTML = countryCode ? `<img class="flag" src="https://flagcdn.com/${countryCode}.svg" alt="flag">` : '';
-      let countryScore = globalScores[country] || 0;
-      scoreBoard.innerHTML = `Score: ${score} (${countryScore})<br>Location: ${country}${flagHTML}`;
+      let flagHTML = countryCode ? `<img class="flag" src="https://flagcdn.com/${countryCode}.svg" alt="flag" 
+style="width:24px;height:16px;vertical-align:middle;margin-left:5px;">` : '';
+      scoreBoard.innerHTML = `Score: ${score}<br>Location: ${country}${flagHTML}`;
     }
 
     video.addEventListener('loadedmetadata', () => {
@@ -208,7 +88,7 @@ startScoreReporter();
       }
 
       if (videoState === 'idlePlay' && video.currentTime >= video.duration) {
-        showGameOver();
+        console.log("Game Over");
       }
     });
 
@@ -249,120 +129,31 @@ startScoreReporter();
       }, 10000);
     }
 
-    function showGameOver() {
-      const tweetText = encodeURIComponent(
-        `I have played Hugeeee Donald Trump Smackdown and I smacked the President ${score} time${score !== 1 ? 's' : ''}.... $smack $trumpmeme #trump #djt`
-      );
-      const msg = `Game over. You have smacked the President ${score} time${score !== 1 ? 's' : ''}.<br>
-        <a id="shareLink" target="_blank" href="https://twitter.com/intent/tweet?text=${tweetText}">Share on X (click here)</a>`;
-      gameOver.innerHTML = msg;
-      gameOver.style.display = 'block';
-    }
-
     document.body.addEventListener('click', () => {
       resetInactivityTimer();
       if (videoState === 'looping') {
         playClickSegment();
         score += 1;
-        globalScores[country] = (globalScores[country] || 0) + 1;
-        localStorage.setItem('globalCountryScores', JSON.stringify(globalScores));
+        window.scoreChanged = true;
         updateScoreBoard();
       }
     });
 
     resetInactivityTimer();
-  
-    function showCountryScores() {
-      let scores = JSON.parse(localStorage.getItem('globalCountryScores') || '{}');
-      let sorted = Object.entries(scores).sort((a,b) => b[1]-a[1]);
-      let text = 'Country Scores:\n' + sorted.map(x => `${x[0]}: ${x[1]}`).join('\n');
-      
-    const modal = document.createElement('div');
-    modal.style.position = 'fixed';
-    modal.style.top = '50%';
-    modal.style.left = '50%';
-    modal.style.transform = 'translate(-50%, -50%)';
-    modal.style.background = '#111';
-    modal.style.color = 'white';
-    modal.style.padding = '20px';
-    modal.style.borderRadius = '10px';
-    modal.style.maxHeight = '80vh';
-    modal.style.overflowY = 'auto';
-    modal.style.zIndex = 1000;
-    modal.style.boxShadow = '0 0 10px #000';
 
-    const title = document.createElement('h2');
-    title.textContent = 'All Country Scores';
-    title.style.marginTop = '0';
-
-    const list = document.createElement('pre');
-    list.textContent = text;
-
-    const close = document.createElement('button');
-    close.textContent = 'Close';
-    close.style.marginTop = '10px';
-    close.onclick = () => document.body.removeChild(modal);
-
-    modal.appendChild(title);
-    modal.appendChild(list);
-    modal.appendChild(close);
-    document.body.appendChild(modal);
-    
+    function startScoreReporter() {
+      setInterval(() => {
+        if (country !== 'Loading...' && window.scoreChanged) {
+          window.scoreChanged = false;
+          fetch('https://hugesmackdown-api.onrender.com/score', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ country })
+          }).catch((e) => console.error("Score submit failed", e));
+        }
+      }, 500);
     }
-    
-/* SCORE REPORT DELAY */
-setInterval(() => {
-  if (window.country && window.scoreSent !== score) {
-    window.scoreSent = score;
-    try {
-      fetch('https://hugesmackdown-api.onrender.com/score', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ country })
-      });
-    } catch (e) {
-      console.error('Score API failed', e);
-    }
-  }
-}, 500);
-
-
-function startScoreReporter() {
-  setInterval(() => {
-    if (window.country && window.scoreSent !== score) {
-      window.scoreSent = score;
-      try {
-        fetch('https://hugesmackdown-api.onrender.com/score', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ country })
-        });
-      } catch (e) {
-        console.error('Score API failed', e);
-      }
-    }
-  }, 500);
-}
-
-
-function startScoreReporter() {
-  setInterval(() => {
-    if (window.country && window.scoreSent !== score) {
-      window.scoreSent = score;
-      try {
-        fetch('https://hugesmackdown-api.onrender.com/score', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ country })
-        });
-      } catch (e) {
-        console.error('Score API failed', e);
-      }
-    }
-  }, 500);
-}
-
-</script>
+  </script>
 </body>
-
 </html>
+
