@@ -80,11 +80,11 @@
 <script async="" crossorigin="anonymous" data-cookieconsent="marketing" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7418183819446491"></script>
 </head>
 <body>
-<h1 id="gameTitle" style="position:absolute;top:0;margin:10px;font-size:32px;width:100%;text-align:left; left: 10px;">Huge Smackdown V.2</h1>
+<h1 id="gameTitle" style="position:absolute;top:0;margin:10px;font-size:32px;width:100%;text-align:left; left: 10px;">Smack Trump</h1>
 <div id="scoreBoard">Score: 0<br/>Location: Loading...</div>
 <div id="canadaScoreDisplay">Canada Total: Loading...</div>
 <div id="viewScores"><a href="#" onclick="showCountryScores()">View all country scores</a></div>
-<video autoplay="" id="trumpVideo" muted="" playsinline="" preload="auto"><source src="trumpcomplete.mp4" type="video/mp4"/></video>
+<video id="trumpVideo" muted="" playsinline="" preload="auto"><source src="trumpcomplete.mp4" type="video/mp4"/></video>
 <audio id="clickSound" preload="auto" src="click.mp3"></audio>
 <div id="flash"></div>
 <div id="gameOver"></div>
@@ -145,7 +145,6 @@ function fetchCanadaScore() {
 
 video.addEventListener('loadedmetadata', () => {
   video.currentTime = 0;
-  video.play();
 });
 
 video.addEventListener('timeupdate', () => {
@@ -242,7 +241,7 @@ function showCountryScores() {
 
 function endGame() {
   const tweetText = encodeURIComponent(
-    `I have played Hugeeee Donald Trump Smackdown and I smacked the President ${score} time${score !== 1 ? 's' : ''}.... $smack $trumpmeme #trump #djt`
+    `I have played  Smack Trump  and I smacked the President ${score} time${score !== 1 ? 's' : ''}.... $smack $trump #meme #trump #djt #crypto #realdonaldtrump`
   );
   const msg = `Game over. You have smacked the President ${score} time${score !== 1 ? 's' : ''}.<br><a href="https://twitter.com/intent/tweet?text=${tweetText}" 
 target="_blank">Would you like to post this on X?</a>`;
