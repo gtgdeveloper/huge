@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Trump Video Game</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: black;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      color: white;
+      font-family: Arial, sans-serif;
+    }
+    video {
+      max-width: 80%;
+      max-height: 80%;
+    }
+    #scoreBoard {
+      position: absolute;
+      top: 10px;
+      text-align: center;
+      font-size: 24px;
+      width: 100%;
+    }
+    #gameOver {
+      display: none;
+      z-index: 10;
+      background: rgba(0, 0, 0, 0.8);
+      border-radius: 10px;
+      text-align: center;
+      position: fixed;
+      bottom: 110px; /* moved up to appear above ad */
+      font-size: 20px;
+      padding: 10px;
+    }
+    #shareLink {
+      color: #1DA1F2;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+    .ad-container {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      text-align: center;
+      background: #000;
+      padding: 10px 0;
+    }
+    .flag {
+      width: 24px;
+      height: 16px;
+      vertical-align: middle;
+      margin-left: 5px;
+    }
+  </style>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+</head>
+<body>
+  <h1 id="gameTitle" style="position:absolute;top:0;margin:10px;font-size:32px;width:100%;text-align:left; left: 10px;">Huge Smackdown</h1>
+  <div id="scoreBoard">Score: 0<br>Location: Loading...</div>
+  <video id="trumpVideo" preload="auto" muted autoplay></video>
+  <audio id="clickSound" src="click.mp3" preload="auto"></audio>
+  <div id="viewScores" style="position:absolute;top:75px;text-align:left;left:10px;font-size:16px;">
+      <a href="#" onclick="showCountryScores()" style="color:#0af;text-decoration:underline;">View all country scores</a>
+     </div>
+     <div id="gameOver">
+    <br><a href="#" onclick="showCountryScores()" style="color:#0af;text-decoration:underline;">View all country scores</a><br></div>
+
+  <div class="ad-container">
+    <!-- Replace with your AdSense code -->
+    <ins class="adsbygoogle"
+         style="display:block"
+         data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+         data-ad-slot="XXXXXXXXXX"
+         data-ad-format="auto"
+         data-full-width-responsive="true"></ins>
+    <script>
+         (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+
+  <script>
+    const video = document.getElementById('trumpVideo');
+    const clickSound = document.getElementById('clickSound');
+    const scoreBoard = document.getElementById('scoreBoard');
+    const gameOver = document.getElementById('gameOver');
+    video.src = 'trumpcomplete.mp4';
+
+    let interactionTimer = null;
+    let looping = true;
+    let lastInteraction = Date.now();
+    let score = 0;
+    let country = 'Loading...';
+    let countryCode = '';
+    let globalScores = JSON.parse(localStorage.getItem('globalCountryScores') || '{}');
+
+    video.muted = true;
+
+    fetch('https://ipapi.co/json/')
+      .then(response => response.json())
+      .then(data => {
+        country = data.country_name || 'Unknown';
+        countryCode = data.country_code ? data.country_code.toLowerCase() : '';
+        updateScoreBoard();
+      })
+      .catch(() => {
+        country = 'Unknown';
+        updateScoreBoard();
+      });
+
+    function updateScoreBoard() {
+      let flagHTML = countryCode ? `<img class="flag" src="https://flagcdn.com/${countryCode}.svg" alt="flag">` : '';
+      let countryScore = globalScores[country] || 0;
+      scoreBoard.innerHTML = `Score: ${score} (${countryScore})<br>Location: ${country}${flagHTML}`;
+    }
+
+    video.addEventListener('loadedmetadata', () => {
+      video.currentTime = 0;
+      video.play();
+    });
+
+    video.addEventListener('timeupdate', () => {
+      if (looping && video.currentTime >= 0.1) {
+        video.currentTime = 0;
+      }
+
+      if (!looping && videoState === 'clickPlay' && video.currentTime >= 2.1) {
+        loopStart();
+      }
+
+      if (videoState === 'idlePlay' && video.currentTime >= video.duration) {
+        showGameOver();
+      }
+    });
+
+    let videoState = 'looping';
+
+    function loopStart() {
+      looping = true;
+      videoState = 'looping';
+      video.muted = true;
+      video.currentTime = 0;
+      video.play();
+    }
+
+    function playClickSegment() {
+      looping = false;
+      videoState = 'clickPlay';
+      video.muted = false;
+      video.currentTime = 0.1;
+      video.play();
+      clickSound.play();
+    }
+
+    function playIdleSegment() {
+      looping = false;
+      videoState = 'idlePlay';
+      video.muted = false;
+      video.currentTime = 2.2;
+      video.play();
+    }
+
+    function resetInactivityTimer() {
+      lastInteraction = Date.now();
+      clearTimeout(interactionTimer);
+      interactionTimer = setTimeout(() => {
+        if (Date.now() - lastInteraction >= 10000 && videoState === 'looping') {
+          playIdleSegment();
+        }
+      }, 10000);
+    }
+
+    function showGameOver() {
+      const tweetText = encodeURIComponent(
+        `I have played Hugeeee Donald Trump Smackdown and I smacked the President ${score} time${score !== 1 ? 's' : ''}.... $smack $trumpmeme #trump #djt`
+      );
+      const msg = `Game over. You have smacked the President ${score} time${score !== 1 ? 's' : ''}.<br>
+        <a id="shareLink" target="_blank" href="https://twitter.com/intent/tweet?text=${tweetText}">Share on X (click here)</a>`;
+      gameOver.innerHTML = msg;
+      gameOver.style.display = 'block';
+    }
+
+    document.body.addEventListener('click', () => {
+      resetInactivityTimer();
+      if (videoState === 'looping') {
+        playClickSegment();
+        score += 1;
+        globalScores[country] = (globalScores[country] || 0) + 1;
+        localStorage.setItem('globalCountryScores', JSON.stringify(globalScores));
+        updateScoreBoard();
+      }
+    });
+
+    resetInactivityTimer();
+  
+    function showCountryScores() {
+      let scores = JSON.parse(localStorage.getItem('globalCountryScores') || '{}');
+      let sorted = Object.entries(scores).sort((a,b) => b[1]-a[1]);
+      let text = 'Country Scores:\n' + sorted.map(x => `${x[0]}: ${x[1]}`).join('\n');
+      
+    const modal = document.createElement('div');
+    modal.style.position = 'fixed';
+    modal.style.top = '50%';
+    modal.style.left = '50%';
+    modal.style.transform = 'translate(-50%, -50%)';
+    modal.style.background = '#111';
+    modal.style.color = 'white';
+    modal.style.padding = '20px';
+    modal.style.borderRadius = '10px';
+    modal.style.maxHeight = '80vh';
+    modal.style.overflowY = 'auto';
+    modal.style.zIndex = 1000;
+    modal.style.boxShadow = '0 0 10px #000';
+
+    const title = document.createElement('h2');
+    title.textContent = 'All Country Scores';
+    title.style.marginTop = '0';
+
+    const list = document.createElement('pre');
+    list.textContent = text;
+
+    const close = document.createElement('button');
+    close.textContent = 'Close';
+    close.style.marginTop = '10px';
+    close.onclick = () => document.body.removeChild(modal);
+
+    modal.appendChild(title);
+    modal.appendChild(list);
+    modal.appendChild(close);
+    document.body.appendChild(modal);
+    
+    }
+    </script>
+</body>
+
+</html>
