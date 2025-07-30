@@ -79,12 +79,13 @@
 </style>
 <script async="" crossorigin="anonymous" data-cookieconsent="marketing" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7418183819446491"></script>
 </head>
-<body>
-<h1 id="gameTitle" style="position:absolute;top:0;margin:10px;font-size:32px;width:100%;text-align:left; left: 10px;">Smack Trump</h1>
+<body><div id="topThreeCountries" style="position: fixed; top: 10px; right: 10px; text-align: right; color: #00FFCC; font-size: 16px; white-space: pre-line; z-index: 10; background: rgba(0,0,0,0.5);">Top 3 Countries:
+Loading...</div>
+<div id="topCountryDisplay" style="position:absolute; top:65px; left:10px; font-size:16px; color:#00FFCC; white-space:pre-line;">Loading country info...</div><h1 id="gameTitle" style="position:absolute;top:0;margin:10px;font-size:32px;width:100%;text-align:left; left: 10px;">Smack Trump</h1>
 <div id="scoreBoard">Score: 0<br/>Location: Loading...</div>
 <div id="canadaScoreDisplay">Canada Total: Loading...</div>
 <div id="viewScores"><a href="#" onclick="showCountryScores()">View all country scores</a></div>
-<video id="trumpVideo" muted="" playsinline="" preload="auto"><source src="trumpcomplete.mp4" type="video/mp4"/></video>
+<video id="trumpVideo" muted="" playsinline="" preload="auto" style="position: relative; z-index: 0;"><source src="trumpcomplete.mp4" type="video/mp4"/></video>
 <audio id="clickSound" preload="auto" src="click.mp3"></audio>
 <div id="flash"></div>
 <div id="gameOver"></div>
@@ -92,7 +93,8 @@
 <ins class="adsbygoogle" data-ad-client="ca-pub-7418183819446491" data-ad-slot="8017832992" data-cookieconsent="marketing" style="display:inline-block;width:728px;height:90px"></ins>
 <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
 </div>
-<script>
+<script>let lastClickTime = Date.now();
+
 const video = document.getElementById('trumpVideo');
 const clickSound = document.getElementById('clickSound');
 const scoreBoard = document.getElementById('scoreBoard');
@@ -248,6 +250,66 @@ target="_blank">Would you like to post this on X?</a>`;
   gameOver.innerHTML = msg;
   gameOver.style.display = 'block';
 }
+
+    
+
+
+
+function getFlagEmoji(countryCode) {
+  if (!countryCode || countryCode.length !== 2) return "";
+  return String.fromCodePoint(...[...countryCode.toUpperCase()].map(c => 0x1f1e6 + c.charCodeAt(0) - 65));
+}
+
+function updateTopCountryDisplay() {
+  fetch('https://hugesmackdown-api.onrender.com/scores')
+    .then(res => res.json())
+    .then(data => {
+      let sorted = Object.entries(data).sort((a, b) => b[1] - a[1]);
+      let displayText = "";
+      if (sorted.length > 0) {
+        let top = sorted[0];
+        let topCountry = top[0];
+        let topScore = top[1];
+
+        if (topCountry !== country) {
+          displayText += `Top Country: ${getFlagEmoji(topCountry.slice(0,2))} ${topCountry} (${topScore})\n`;
+          displayText += `Your Country: ${getFlagEmoji(country.slice(0,2))} ${country} (${data[country] || 0})`;
+        }
+      }
+      document.getElementById("topCountryDisplay").textContent = displayText;
+    })
+    .catch(() => {
+      document.getElementById("topCountryDisplay").textContent = "";
+    });
+}
+setInterval(updateTopCountryDisplay, 5000);
+
+function updateTopThreeCountries() {
+  fetch('https://hugesmackdown-api.onrender.com/scores')
+    .then(res => res.json())
+    .then(data => {
+      let sorted = Object.entries(data).sort((a, b) => b[1] - a[1]);
+      let displayText = "Top 3 Countries:\n";
+      sorted.slice(0, 3).forEach((entry, index) => {
+        const [name, score] = entry;
+        const emoji = getFlagEmoji(name.slice(0,2));
+        displayText += `#${index + 1}: ${emoji} ${name} (${score})\n`;
+      });
+      document.getElementById("topThreeCountries").textContent = displayText.trim();
+    })
+    .catch(() => {
+      document.getElementById("topThreeCountries").textContent = "Top 3 Countries:\nError loading";
+    });
+}
+setInterval(updateTopThreeCountries, 5000);
+updateTopThreeCountries();
+
+function checkInactivity() {
+  if (Date.now() - lastClickTime > 15000) {
+    endGame();
+  }
+}
+setInterval(checkInactivity, 1000);
 </script>
 </body>
 </html>
