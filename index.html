@@ -200,6 +200,7 @@ function flashScreen() {
 }
 
 document.body.addEventListener('click', () => {
+  lastClickTime = Date.now();
   resetInactivityTimer();
   if (videoState === 'looping' || videoState === 'clickPlay') {
     looping = false;
