@@ -244,12 +244,8 @@ function showCountryScores() {
 
 function endGame() {
  const tweetText = encodeURIComponent(
-  `I have played the Smack Trump game and I smacked the President ${score} time${score !== 1 ? 's' : ''}.... $smack $trump #meme @smacktrump @elonmusk #trump #djt #crypto #realdonaldtrump\nhttps://huge-smackdown.onrender.com/`
-);
-const msg = `Game over. You have smacked the President ${score} time${score !== 1 ? 's' : ''}.<br>
-  <a id="shareLink" target="_blank" href="https://twitter.com/intent/tweet?text=${tweetText}">Share on X (click here)</a>`;
-gameOver.innerHTML = msg;
-gameOver.style.display = 'block';
+    `I have played the Smack Trump game and I smacked the President ${score} time${score !== 1 ? 's' : ''}.... $smack $trump #meme #trump #djt #crypto #realdonaldtrump`
+  );
 
   const msg = `Game over. You have smacked the President ${score} time${score !== 1 ? 's' : ''}.<br><a href="https://twitter.com/intent/tweet?text=${tweetText}" 
 target="_blank">Would you like to post this on X for a chance to win great prizes?</a>`;
